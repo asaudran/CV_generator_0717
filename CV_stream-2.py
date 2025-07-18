@@ -184,8 +184,13 @@ if st.button("📄 Générer mon CV"):
     # Génère un lien de téléchargement en base64
     b64 = base64.b64encode(pdf_bytes).decode()
     href = (
-        f'<a href="data:application/pdf;base64,{b64}" '
-        'download="cv.pdf">⬇️ Télécharger ton CV</a>'
+        f'<a '
+        f'href="data:application/pdf;base64,{b64}" '
+        'download="cv.pdf" '
+        'target="_blank" '
+        'rel="noopener noreferrer"'
+        '>⬇️ Télécharger ton CV</a>'
     )
     st.markdown(href, unsafe_allow_html=True)
+
 
