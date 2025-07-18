@@ -8,6 +8,8 @@ import openai
 import streamlit as st
 import requests
 from pathlib import Path
+import base64   
+
 
 # Charge les variables d'environnement depuis .env si présent
 load_dotenv()
@@ -178,9 +180,12 @@ if st.button("📄 Générer mon CV"):
     # Téléchargement du PDF généré
     pdf_bytes = resp.content
     st.success("✅ CV compilé avec succès !")
-    st.download_button(
-        "⬇️ Télécharger le PDF",
-        data=pdf_bytes,
-        file_name="cv.pdf",
-        mime="application/pdf"
+    
+    # Génère un lien de téléchargement en base64
+    b64 = base64.b64encode(pdf_bytes).decode()
+    href = (
+        f'<a href="data:application/pdf;base64,{b64}" '
+        'download="cv.pdf">⬇️ Télécharger ton CV</a>'
     )
+    st.markdown(href, unsafe_allow_html=True)
+
