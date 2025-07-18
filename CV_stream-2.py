@@ -7,8 +7,10 @@ from dotenv import load_dotenv
 import openai
 import streamlit as st
 import requests
-import io
 from pathlib import Path
+
+# Charge les variables d'environnement depuis .env si présent
+load_dotenv()
 
 # --- 0. Configuration de la page et du template LaTeX ---
 st.set_page_config(page_title="Générateur de CV PDF", layout="centered")
@@ -111,11 +113,11 @@ def ameliorer_champ(field_key):
         st.error(f"Erreur API GPT : {e}")
         st.stop()
 
-# --- 5. Initialisation de session_state pour tous les champs ---
+# --- 4. Initialisation de session_state pour tous les champs ---
 for key in example_data:
     st.session_state.setdefault(key, "")
 
-# --- 6. Formulaire de saisie ---
+# --- 5. Formulaire de saisie ---
 st.header("1. Remplis ton CV")
 fields = [
     ("name", "Nom complet"),
@@ -152,7 +154,7 @@ for key, label in fields:
     with c3:
         st.button("GPT+", key=f"gpt_{key}", help="Améliore la formulation via l'API", on_click=ameliorer_champ, args=(key,))
 
-# --- 7. Génération du PDF via latexonline.cc ---
+# --- 6. Génération du PDF via latexonline.cc ---
 st.header("2. Génère ton PDF")
 if st.button("📄 Générer mon CV"):
     if not TEMPLATE_PATH.exists():
@@ -164,9 +166,11 @@ if st.button("📄 Générer mon CV"):
     for key in example_data:
         tex = tex.replace(f"{{{{{key}}}}}", st.session_state[key])
 
-    # Envoi à latexonline.cc pour compilation
-    files = {"file": ("cv.tex", tex.encode("utf-8"))}
-    resp = requests.post("https://latexonline.cc/compile", files=files)
+    # Envoi à latexonline.cc via query string
+    resp = requests.get(
+        "https://latexonline.cc/compile",
+        params={"text": tex}
+    )
     if resp.status_code != 200:
         st.error(f"❌ La compilation a échoué (status {resp.status_code})")
         st.stop()
