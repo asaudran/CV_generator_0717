@@ -3,7 +3,6 @@
 
 import os
 from dotenv import load_dotenv
-load_dotenv()  # charge .env si présent
 
 import openai
 import streamlit as st
